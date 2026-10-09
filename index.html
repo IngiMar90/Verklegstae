@@ -78,11 +78,11 @@ function showMeasureDemo(){
  $('question').textContent='Sýnidæmi: Svona mælir þú línu í '+(mm?'millímetrum':'sentímetrum');
  $('scene').innerHTML=measureMarkup(n,measureUnit,true,offset);
  $('choices').innerHTML='';
- $('feedback').textContent='(advanced?'Línan byrjar við '+offset+' cm og endar við '+(offset+n)+' cm. '+(offset+n)+' − '+offset+' = '+n+' cm.':'Línan mælist '+n+' '+measureUnit+'.');
+ $('feedback').textContent=advanced?'Línan byrjar við '+offset+' cm og endar við '+(offset+n)+' cm. '+(offset+n)+' − '+offset+' = '+n+' cm.':'Línan mælist '+n+' '+measureUnit+'.';
  $('feedback').className='feedback good';
  $('next').classList.remove('hide');
  $('next').textContent='Ég skil – byrja að mæla →';
- speak('Sýnidæmi. ');
+ speak(advanced?'Sýnidæmi. Línan byrjar við tvo og endar við sex. Sex mínus tveir eru fjórir sentímetrar.':'Sýnidæmi. Settu núllið á reglustikunni við upphaf línunnar og lestu lengdina þar sem línan endar.');
 }
 function activateMeasure(){
  const svgEl=$('measureSvg'),g=$('movingRuler');if(!svgEl||!g)return;
