@@ -32,7 +32,7 @@ function save(){try{localStorage.setItem(storeKey,JSON.stringify(progress))}catc
 function speak(s){if(!voiceOn||!('speechSynthesis'in window))return;window.speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);u.lang='is-IS';u.rate=.85;window.speechSynthesis.speak(u)}
 function grid(){ $('topics').innerHTML=topics.map(t=>'<button class="topic" data-id="'+t[0]+'"><span class="emoji">'+t[1]+'</span><b>'+t[2]+'</b><small>'+t[3]+'</small><br><small>'+(progress[t[0]]?'Best: '+progress[t[0]]+'/10':'Ekki æft enn')+'</small></button>').join('');document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>start(b.dataset.id))}
 function home(){$('game').classList.add('hide');$('home').classList.remove('hide');grid();if('speechSynthesis'in window)window.speechSynthesis.cancel()}
-function start(id){current=id;step=0;score=0;$('home').classList.add('hide');$('game').classList.remove('hide');measureUnit=Number($('level').value)===3?'mm':'cm';if(id==='ruler'){showMeasureDemo()}else nextTask()}
+function start(id){current=id;step=0;score=0;$('home').classList.add('hide');$('game').classList.remove('hide');measureUnit=Number($('level').value)===3?'mm':'cm';if(id==='ruler'){showMeasureDemo()}else if(id==='forms'){showFormsDemo()}else nextTask()}
 function uniqueOptions(answer,more){let a=[String(answer),...more.map(String).filter(x=>String(x)!==String(answer))];a=[...new Set(a)];while(a.length<4){let n=String(rnd(1,20));if(!a.includes(n))a.push(n)}return shuffle(a.slice(0,4))}
 function translateInstruction(t){
  const phrases={'Hvor hluturinn er stærri?':'Which object is bigger?','Hvor hluturinn er minni?':'Which object is smaller?','Hvor hluturinn er lengri?':'Which object is longer?','Hvor hluturinn er styttri?':'Which object is shorter?','Hvor hluturinn er hærri?':'Which object is taller?','Hvor hluturinn er lægri?':'Which object is lower?','Hvor hluturinn er þykkari?':'Which object is thicker?','Hvor hluturinn er grennri?':'Which object is thinner?','Í hvorum hópi eru fleiri?':'Which group has more?','Í hvorum hópi er meira magn?':'Which group has a larger amount?','Hvort er léttara?':'Which is lighter?','Hvort er þyngra?':'Which is heavier?','Hver er fyrstur í röðinni?':'Who is first in line?','Hver er síðastur í röðinni?':'Who is last in line?','Hver er í miðjunni?':'Who is in the middle?','Hvað heitir þetta form?':'What is this shape called?','Dragðu reglustikuna að línunni. Hvað er hún löng?':'Move the ruler to the line. How long is it?','Veldu rétt svar':'Choose the correct answer'};
@@ -93,6 +93,21 @@ function showMeasureDemo(){
  $('next').classList.remove('hide');
  $('next').textContent='Ég skil – byrja að mæla →';
  speak(advanced?'Sýnidæmi. Línan byrjar við tvo og endar við sex. Sex mínus tveir eru fjórir sentímetrar.':'Sýnidæmi. Settu núllið á reglustikunni við upphaf línunnar og lestu lengdina þar sem línan endar.');
+}
+function showFormsDemo(){
+ measureDemo=true;answered=false;
+ $('count').textContent='Sýnidæmi • Form';
+ $('bar').style.width='0%';
+ $('question').textContent='Skoðaðu formin og lærðu heitin þeirra.';
+ $('questionEn').textContent='Look at the shapes and learn their names.';
+ const shapes=[['circle','Hringur','Circle'],['triangle','Þríhyrningur','Triangle'],['square','Ferningur','Square'],['cube','Kubbur','Cube'],['sphere','Kúla','Sphere']];
+ $('scene').innerHTML='<div class="objects" style="align-items:center;flex-wrap:wrap">'+shapes.map(x=>'<div class="object" style="min-width:120px">'+shapeIcon(x[0],100)+'<b>'+x[1]+'</b><small lang="en" class="muted">'+x[2]+'</small></div>').join('')+'</div>';
+ $('choices').innerHTML='';
+ $('feedback').textContent='Skoðaðu myndirnar áður en þú byrjar.';
+ $('feedback').className='feedback';
+ $('next').classList.remove('hide');
+ $('next').textContent='Byrja æfingu →';
+ speak('Skoðaðu formin og lærðu heitin þeirra.');
 }
 function activateMeasure(){
  const svgEl=$('measureSvg'),g=$('movingRuler');if(!svgEl||!g)return;
@@ -159,8 +174,8 @@ if(id==='forms'){
  if(level===1){
   const options=shuffle(types).slice(0,4);if(!options.includes(shown))options[rnd(0,3)]=shown;
   return q('Hvar er '+(shown==='circle'?'hringurinn':shown==='triangle'?'þríhyrningurinn':shown==='square'?'ferhyrningurinn':shown==='cube'?'kubburinn':'kúlan')+'?',
-  row(...options.map(type=>'<div class="object">'+shapeIcon(type)+'<b>'+names[type]+'</b></div>')),
-  names[shown],options.map(type=>names[type]),'Skoðaðu formið og veldu heiti þess.');
+  row(...options.map((type,i)=>'<div class="object">'+shapeIcon(type)+'<b>'+String.fromCharCode(65+i)+'</b></div>')),
+  String.fromCharCode(65+options.indexOf(shown)),['A','B','C','D'],'Skoðaðu myndirnar og veldu réttan bókstaf.');
  }
  const opts=shuffle([names[shown],...shuffle(types.filter(t=>t!==shown)).slice(0,level===2?2:3).map(t=>names[t])]);
  return q('Hvað heitir þetta form?',shapeIcon(shown,160),names[shown],opts,
